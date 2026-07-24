@@ -20,7 +20,15 @@ export class FaceTracker {
   }
 
   async init() {
-    this.faceMesh = new FaceMesh({
+    // ✅ FIX: Access FaceMesh through global window scope
+    const FaceMeshClass = window.FaceMesh;
+
+    if (!FaceMeshClass) {
+      console.error("MediaPipe FaceMesh script not loaded on window!");
+      return;
+    }
+
+    this.faceMesh = new FaceMeshClass({
       locateFile: (file) =>
         `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
     });
@@ -68,8 +76,10 @@ export class FaceTracker {
         canvas.height = video.videoHeight;
       }
 
-      // Send frame to MediaPipe (async, results arrive via onResults)
-      this.faceMesh.send({ image: video });
+      // Send frame to MediaPipe asynchronously
+      if (this.faceMesh) {
+        this.faceMesh.send({ image: video }).catch(() => {});
+      }
 
       // Draw mirrored video
       ctx.save();

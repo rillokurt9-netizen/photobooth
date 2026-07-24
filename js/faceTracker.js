@@ -27,10 +27,10 @@ export class FaceTracker {
       return;
     }
 
-    // ✅ FIXED locateFile syntax:
+    // Matching exact version string fixes the XHR binary asset loader bug
     this.faceMesh = new FaceMeshClass({
       locateFile: (file) => {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633552486/${file}`;
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/${file}`;
       }
     });
 

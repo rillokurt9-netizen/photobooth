@@ -27,10 +27,10 @@ export class FaceTracker {
       return;
     }
 
-    // Matching exact version string fixes the XHR binary asset loader bug
+    // Using Google's official static CDN endpoint prevents jsDelivr path corruption
     this.faceMesh = new FaceMeshClass({
       locateFile: (file) => {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/${file}`;
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
       }
     });
 

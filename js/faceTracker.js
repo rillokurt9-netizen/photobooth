@@ -27,10 +27,10 @@ export class FaceTracker {
       return;
     }
 
-    // Using Google's official static CDN endpoint prevents jsDelivr path corruption
+    // Exact version matching prevents graph calculator and asset loading mismatches
     this.faceMesh = new FaceMeshClass({
       locateFile: (file) => {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/${file}`;
       }
     });
 

@@ -20,7 +20,6 @@ export class FaceTracker {
   }
 
   async init() {
-    // ✅ FIX: Access FaceMesh through global window scope
     const FaceMeshClass = window.FaceMesh;
 
     if (!FaceMeshClass) {
@@ -28,9 +27,11 @@ export class FaceTracker {
       return;
     }
 
+    // ✅ FIXED locateFile syntax:
     this.faceMesh = new FaceMeshClass({
-      locateFile: (file) =>
-        `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
+      locateFile: (file) => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633552486/${file}`;
+      }
     });
 
     this.faceMesh.setOptions({
@@ -76,12 +77,10 @@ export class FaceTracker {
         canvas.height = video.videoHeight;
       }
 
-      // Send frame to MediaPipe asynchronously
       if (this.faceMesh) {
         this.faceMesh.send({ image: video }).catch(() => {});
       }
 
-      // Draw mirrored video
       ctx.save();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.translate(canvas.width, 0);
@@ -89,7 +88,6 @@ export class FaceTracker {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       ctx.restore();
 
-      // Apply AR filter on top
       if (this.landmarks && this.currentFilter !== 'none') {
         ctx.save();
         ctx.translate(canvas.width, 0);
@@ -104,7 +102,6 @@ export class FaceTracker {
     requestAnimationFrame(() => this.renderLoop());
   }
 
-  /** Capture current composited frame as data URL */
   captureFrame() {
     return this.canvas.toDataURL('image/png');
   }

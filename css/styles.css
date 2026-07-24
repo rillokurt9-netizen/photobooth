@@ -1,0 +1,93 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.countdown-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 20;
+  pointer-events: none;
+}
+
+.countdown-overlay .countdown-number {
+  font-size: clamp(5rem, 20vw, 10rem);
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 40px rgba(255, 107, 157, 0.8), 0 0 80px rgba(192, 132, 252, 0.6);
+  animation: countdown-pop 0.8s ease-out;
+}
+
+@keyframes countdown-pop {
+  0% { transform: scale(2); opacity: 0; }
+  30% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 1; }
+}
+
+.flash-overlay {
+  position: absolute;
+  inset: 0;
+  background: white;
+  z-index: 25;
+  pointer-events: none;
+  animation: flash 0.3s ease-out forwards;
+}
+
+@keyframes flash {
+  0% { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+
+.snap-btn:not(:disabled):active {
+  transform: scale(0.96);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  position: relative;
+  background: #1a1229;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  max-width: 520px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+}
+
+#partnerVideo.connected {
+  display: block;
+}
+
+#partnerPlaceholder.hidden {
+  display: none;
+}

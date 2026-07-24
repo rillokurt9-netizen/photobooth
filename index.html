@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Couple's Photobooth 📸</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            booth: {
+              bg: '#0f0a1a',
+              panel: '#1a1229',
+              accent: '#ff6b9d',
+              glow: '#c084fc',
+            },
+          },
+          fontFamily: {
+            display: ['"Fredoka"', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="min-h-screen bg-booth-bg text-white font-display overflow-hidden">
+
+  <!-- Header -->
+  <header class="text-center py-4 px-4 border-b border-white/10 bg-booth-panel/80 backdrop-blur-sm">
+    <h1 class="text-2xl md:text-3xl font-bold tracking-tight">
+      Our Couple's Photobooth <span aria-hidden="true">📸</span>
+    </h1>
+    <p class="text-sm text-white/50 mt-1">Long-distance love, up close &amp; personal</p>
+  </header>
+
+  <!-- Main dual-panel viewport -->
+  <main class="flex-1 flex flex-col md:flex-row gap-3 p-3 md:p-4 min-h-0" style="height: calc(100vh - 180px);">
+    <!-- Me panel -->
+    <section class="flex-1 flex flex-col min-h-0 min-w-0">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+        <h2 class="text-lg font-semibold text-booth-accent">Me</h2>
+      </div>
+      <div class="relative flex-1 rounded-2xl overflow-hidden border-2 border-booth-accent/40 shadow-lg shadow-booth-accent/10 bg-black">
+        <canvas id="meCanvas" class="w-full h-full object-cover"></canvas>
+        <div id="meCountdown" class="countdown-overlay hidden"></div>
+        <div id="meFlash" class="flash-overlay hidden"></div>
+      </div>
+    </section>
+
+    <!-- Partner panel -->
+    <section class="flex-1 flex flex-col min-h-0 min-w-0">
+      <div class="flex items-center gap-2 mb-2">
+        <span id="partnerStatusDot" class="w-2 h-2 rounded-full bg-gray-500"></span>
+        <h2 class="text-lg font-semibold text-booth-glow">Partner</h2>
+        <span id="partnerStatusText" class="text-xs text-white/40 ml-auto">Not connected</span>
+      </div>
+      <div class="relative flex-1 rounded-2xl overflow-hidden border-2 border-booth-glow/40 shadow-lg shadow-booth-glow/10 bg-black">
+        <video id="partnerVideo" class="w-full h-full object-cover" autoplay playsinline muted></video>
+        <canvas id="partnerCanvas" class="hidden"></canvas>
+        <div id="partnerPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center text-white/30 gap-3">
+          <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          <p class="text-sm">Waiting for partner…</p>
+        </div>
+        <div id="partnerCountdown" class="countdown-overlay hidden"></div>
+        <div id="partnerFlash" class="flash-overlay hidden"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Control bar -->
+  <footer class="bg-booth-panel border-t border-white/10 px-4 py-3 md:py-4">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-4">
+
+      <!-- AR Filter selector -->
+      <div class="flex items-center gap-2 flex-1 min-w-0">
+        <label for="filterSelect" class="text-sm font-medium text-white/70 whitespace-nowrap">AR Filter</label>
+        <select id="filterSelect"
+          class="flex-1 min-w-0 bg-white/10 border border-white/20 rounded-xl px-3 py-2.5 text-sm
+                 focus:outline-none focus:ring-2 focus:ring-booth-accent cursor-pointer">
+          <option value="none">No Filter</option>
+          <option value="spiderman">🕷️ Spider-Man Mask</option>
+          <option value="mario">🍄 Mario Hat &amp; Mustache</option>
+          <option value="clown">🤡 Classic Clown</option>
+          <option value="batman">🦇 Batman Mask</option>
+          <option value="luigi">🟢 Luigi Hat &amp; Mustache</option>
+          <option value="viking">⚔️ Viking Helmet</option>
+          <option value="y2k">😎 Y2K Cyber Glasses</option>
+        </select>
+      </div>
+
+      <!-- Connection UI -->
+      <div class="flex items-center gap-2 flex-1 min-w-0">
+        <input id="roomIdInput" type="text" placeholder="Room ID (e.g. love2024)"
+          maxlength="20"
+          class="flex-1 min-w-0 bg-white/10 border border-white/20 rounded-xl px-3 py-2.5 text-sm
+                 placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-booth-glow" />
+        <button id="connectBtn"
+          class="px-4 py-2.5 rounded-xl bg-booth-glow/20 border border-booth-glow/50 text-sm font-semibold
+                 hover:bg-booth-glow/30 transition-colors whitespace-nowrap">
+          Connect
+        </button>
+        <div id="connectionIndicator" class="flex items-center gap-1.5 whitespace-nowrap">
+          <span id="connDot" class="w-2.5 h-2.5 rounded-full bg-gray-500"></span>
+          <span id="connLabel" class="text-xs text-white/50">Offline</span>
+        </div>
+      </div>
+
+      <!-- Snap button -->
+      <button id="snapBtn"
+        disabled
+        class="snap-btn px-8 py-3 rounded-2xl text-lg font-bold tracking-wide
+               bg-gradient-to-r from-booth-accent to-pink-500
+               hover:from-pink-400 hover:to-booth-accent
+               shadow-lg shadow-booth-accent/30 transition-all
+               disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap">
+        📸 Snap Photo!
+      </button>
+    </div>
+  </footer>
+
+  <!-- Capture preview modal -->
+  <div id="stripModal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-bold">Your Photobooth Strip 🎞️</h3>
+        <button id="closeModalBtn" class="text-white/50 hover:text-white text-2xl leading-none">&times;</button>
+      </div>
+      <canvas id="stripCanvas" class="w-full rounded-xl border border-white/20"></canvas>
+      <div class="flex gap-3 mt-4">
+        <a id="downloadBtn" download="couples-photobooth.png"
+          class="flex-1 text-center py-3 rounded-xl bg-booth-accent font-semibold hover:bg-pink-400 transition-colors">
+          ⬇️ Download Strip
+        </a>
+        <button id="retakeBtn"
+          class="flex-1 py-3 rounded-xl bg-white/10 border border-white/20 font-semibold hover:bg-white/20 transition-colors">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden elements -->
+  <video id="webcamVideo" autoplay playsinline muted class="hidden"></video>
+
+  <!-- MediaPipe -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <!-- PeerJS -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <!-- App entry -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
